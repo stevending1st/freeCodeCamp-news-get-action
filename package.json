@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "jest": "jest",
-    "t": "lint-staged",
+    "prefix": "lint-staged",
     "build": "ncc build ./src/index.js -o dist --license licenses.txt"
   },
   "repository": {
@@ -51,7 +51,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm t"
+      "pre-commit": "npm prefix"
     }
   }
 }
