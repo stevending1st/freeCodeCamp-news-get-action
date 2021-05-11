@@ -1,0 +1,16 @@
+name: 'freeCodeCamp-news-get-action'
+description: 'freeCodeCamp-news-get-action'
+author: ""
+inputs:
+  issuesBody:
+    description: ''
+    required: true
+  markDownFileURL: # './chinese/articles/'
+    description: ''
+    required: false
+    default: "./"
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+       node ./script/toMarkdown/index.js;
