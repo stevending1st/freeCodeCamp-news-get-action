@@ -11,7 +11,7 @@ const {
 
 const {
   Path_ArticleFolder_R,
-  Err_DontGetThirdParam,
+  Err_DontGetIssuesBody,
   Err_DontGetTrueRoute,
   Err_SameNameFile,
   Err_NoPath,
@@ -30,12 +30,18 @@ const turndownService = new TurndownService({
   .use(taskListItems)
   .use(gfm);
 
-// Get the URL of the article from command line parameters.
-exports.getThirdParam = () =>
-  new Promise((resolve, reject) => {
-    const thirdParam = core.getInput('issuesBody') || undefined;
+// Gather all conditioned inputs
+exports.gatherInputs = function gatherInputs() {
+  return {
+    issuesBody: core.getInput("issuesBody") || undefined,
+    markDownFileURL: core.getInput("markDownFileURL") || "./",
+  }
+}
 
-    thirdParam ? resolve(thirdParam) : reject(Err_DontGetThirdParam);
+// Existence check of input parameters.
+exports.inputExistCheck = (input) =>
+  new Promise((resolve, reject) => {
+    input.issuesBody ? resolve(input.issuesBody) : reject(Err_DontGetIssuesBody);
   });
 
 // Check the input parameters, and get the routing address of the article.
@@ -81,7 +87,7 @@ exports.HTMLtoMarkdown = (html) =>
     // Original author's personal page
     const authorURL = hostURL_EN + authorCardName.attr('href');
 
-    if (!articleTitle || !authorName || authorURL === hostURL_EN)
+    if (!articleTitle || !authorName || (authorURL === hostURL_EN))
       return reject(Err_DOMWrong);
 
     // full image

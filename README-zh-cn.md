@@ -31,10 +31,10 @@ news-translate
       |  index.js  /** 脚本的入口文件 **/
       |  README.md
       |  toMarkdownConstant.js  /** 配置文件 **/
-      |  toMarkdownSubfun.js  /** 函数库文件 **/
+      |  utilities.js  /** 函数库文件 **/
       |
       |-__tests__
-         toMarkdownSubfun.test.js  /** 测试文件 **/
+         utilities.test.js  /** 测试文件 **/
 ```
 ---
 

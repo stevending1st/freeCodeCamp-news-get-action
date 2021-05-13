@@ -31,10 +31,10 @@ news-translate
       |  index.js  /** Entry file of the script **/
       |  README.md
       |  toMarkdownConstant.js  /** Configuration file **/
-      |  toMarkdownSubfun.js  /** Function library file **/
+      |  utilities.js  /** Function library file **/
       |
       |-__tests__
-         toMarkdownSubfun.test.js  /** test file **/
+         utilities.test.js  /** test file **/
 ```
 
 ---

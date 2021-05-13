@@ -3,23 +3,26 @@ const nodeFetch = require('node-fetch');
 const fsPromises = require('fs/promises');
 const {
   hostURL_EN,
-  options,
-  Path_ArticleFolder_R
+  options
 } = require('./toMarkdownConstant.js');
 const {
-  getThirdParam,
+  gatherInputs,
+  inputExistCheck,
   getRouteAddr,
   haveRouterAddrmd,
   HTMLtoMarkdown
-} = require('./toMarkdownSubfun.js');
+} = require('./utilities.js');
 
 // cd ./news-translation
 // You can run `node script\toMarkdown\index.js URL<String>`(URL is the URL of the article).
 
 (async function toMarkdown() {
   try {
-    const thirdParam = await getThirdParam();
-    const articleChildRouter = await getRouteAddr(thirdParam);
+    const input = gatherInputs();
+
+    await inputExistCheck(input);
+
+    const articleChildRouter = await getRouteAddr(input.issuesBody);
 
     const URL = `${hostURL_EN}/news/${articleChildRouter}/`;
     options.path = `/news/${articleChildRouter}/`;
@@ -30,7 +33,7 @@ const {
     const articleText = await HTMLtoMarkdown(htmlString);
 
     await fsPromises.writeFile(
-      Path_ArticleFolder_R + articleFileName,
+      input.markDownFileURL + articleFileName,
       articleText
     );
   } catch (error) {

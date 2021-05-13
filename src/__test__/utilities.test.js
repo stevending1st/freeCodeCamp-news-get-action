@@ -1,5 +1,5 @@
 const {
-  Err_DontGetThirdParam,
+  Err_DontGetIssuesBody,
   Err_DontGetTrueRoute,
   Err_SameNameFile,
   Err_NoPath,
@@ -7,111 +7,138 @@ const {
   options
 } = require("../toMarkdownConstant.js");
 const {
-  getThirdParam,
+  gatherInputs,
+  inputExistCheck,
   getRouteAddr,
   haveRouterAddrmd,
   HTMLtoMarkdown
-} = require("../toMarkdownSubfun.js");
+} = require("../utilities.js");
 
-describe("1. test getThirdParam(Get the URL of the article from command line parameters.)", () => {
-  test("1-1. Number string.", () => {
-    process.argv = ["node", "jest", "10"]
-    return getThirdParam().then((data) => {
-      expect(data).toBe("10");
+// Take an object of key/value pairs and convert it to input environment variables
+function buildInput(inputs) {
+  let key = "";
+  for(key in inputs) {
+    process.env[`INPUT_${key.replace(/ /g, '_').toUpperCase()}`] = inputs[key];
+  }
+}
+
+  // Reset modules and remove input environment variables before each run
+  beforeEach(() => {
+    jest.resetModules();
+    delete process.env.INPUT_ISSUESBODY;
+    delete process.env.INPUT_MARKDOWNFILEURL;
+  });
+
+describe("1. test gather all conditioned inputs.", () => {
+  test("1-1. gather minimal inputs.", () => {
+    expect(gatherInputs()).toEqual({
+      issuesBody: undefined,
+      markDownFileURL: "./"
     });
   });
 
-  test("1-2. URL string.", () => {
-    process.argv = ["node", "jest", "https://www.freecodecamp.org/news/testexample/"]
-    return getThirdParam().then((data) => {
-      expect(data).toBe("https://www.freecodecamp.org/news/testexample/");
+  test("1-2. With parameters.", () => {
+    buildInput({
+      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFileURL: "./src/test/"
     });
-  });
 
-  test("1-3. There is no third parameter.", () => {
-    process.argv = ["node", "jest"]
-    return getThirdParam().catch((err) => {
-      expect(err).toBe(Err_DontGetThirdParam);
-    });
-  });
-
-  test("1-4. There are four parameters.", () => {
-    process.argv = ["node", "jest", "https://www.freecodecamp.org/news/testexample/", "testText"]
-    return getThirdParam().then((data) => {
-      expect(data).toBe("https://www.freecodecamp.org/news/testexample/");
+    expect(gatherInputs()).toEqual({
+      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFileURL: "./src/test/"
     });
   });
 });
 
-describe("2. test getRouteAddr(Check the input parameters, and get the routing address of the article.)", () => {
-  test("2-1. there is the correct URL in the parameter.", () => {
+describe("2. test existence check of input parameters.)", () => {
+  test("2-1. exist.", () => {
+    return inputExistCheck({
+      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFileURL: "./"
+    }).then((data) => {
+      expect(data).toBe("test.XXXXXXXXXxxxxxxXXXXXXXxxxxx");
+    });
+  });
+
+  test("2-2. does not exist.", () => {
+    return inputExistCheck({
+      issuesBody: undefined,
+      markDownFileURL: "./"
+    }).catch((err) => {
+      expect(err).toBe(Err_DontGetIssuesBody);
+    });
+  });
+});
+
+describe("3. test getRouteAddr(Check the input parameters, and get the routing address of the article.)", () => {
+  test("3-1. there is the correct URL in the parameter.", () => {
     return getRouteAddr("- 原文网址：[Test Example](https://www.freecodecamp.org/news/testexample/)").then((data) => {
       expect(data).toBe("testexample");
     });
   });
 
-  describe("2-2. Wrong URL test", () => {
-    test("2-2-1. Without the last forward slash", ()=>{
+  describe("3-2. Wrong URL test", () => {
+    test("3-2-1. Without the last forward slash", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](https://www.freecodecamp.org/news/testexample)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-2. http", ()=>{
+    test("3-2-2. http", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](http://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-3. No htts", ()=>{
+    test("3-2-3. No htts", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-4. No www", ()=>{
+    test("3-2-4. No www", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](https://freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-5. No news", ()=>{
+    test("3-2-5. No news", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](https://www.freecodecamp.org/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-6. No Route", ()=>{
+    test("3-2-6. No Route", ()=>{
       return getRouteAddr("- 原文网址：[Test Example](https://www.freecodecamp.org/news/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-8. Without '- 原文网址：'", ()=>{
+    test("3-2-8. Without '- 原文网址：'", ()=>{
       return getRouteAddr("[Test Example](https://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-8. With '\\n'", ()=>{
+    test("3-2-8. With '\\n'", ()=>{
       return getRouteAddr("- 原文网址：[Test\nExample](https://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-8. With '\\f'", ()=>{
+    test("3-2-8. With '\\f'", ()=>{
       return getRouteAddr("- 原文网址：[Test\fExample](https://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-8. With '\\r'", ()=>{
+    test("3-2-8. With '\\r'", ()=>{
       return getRouteAddr("- 原文网址：[Test\rExample](https://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
     });
 
-    test("2-2-8. With '\\t'", ()=>{
+    test("3-2-8. With '\\t'", ()=>{
       return getRouteAddr("- 原文网址：[Test\tExample](https://www.freecodecamp.org/news/testexample/)").catch((err) => {
         expect(err).toBe(Err_DontGetTrueRoute);
       });
@@ -119,23 +146,23 @@ describe("2. test getRouteAddr(Check the input parameters, and get the routing a
   });
 });
 
-describe("3. test haveRouterAddrmd(Check if the ${routerAddr}.md exists.If it exists, an error is reported.)", () => {
-  test("3-1. This article does not exist", () => {
+describe("4. test haveRouterAddrmd(Check if the ${routerAddr}.md exists.If it exists, an error is reported.)", () => {
+  test("4-1. This article does not exist", () => {
     return haveRouterAddrmd("testexample").then((data) => {
       expect(data).toBe("testexample.md");
     });
   });
 
-  test("3-2. This article exists ", () => {
+  test("4-2. This article exists ", () => {
     return haveRouterAddrmd("20-lines-of-python-code-get-notified-by-sms-when-your-favorite-team-scores-a-goal").catch((err) => {
       expect(err).toBe(Err_SameNameFile);
     });
   });
 });
 
-describe("4. test HTMLtoMarkdown(Write content to file).", () => {
-  describe("4-1. Normal case ",() => {
-    test("4-1-1. <img src='/postFullImageURL'>", () => {
+describe("5. test HTMLtoMarkdown(Write content to file).", () => {
+  describe("5-1. Normal case ",() => {
+    test("5-1-1. <img src='/postFullImageURL'>", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -231,7 +258,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-1-2. <img src='https://www.freecodecamp.org/postFullImageURL'>", () => {
+    test("5-1-2. <img src='https://www.freecodecamp.org/postFullImageURL'>", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -279,7 +306,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-1-3. <img src='http://www.freecodecamp.org/postFullImageURL'>", () => {
+    test("5-1-3. <img src='http://www.freecodecamp.org/postFullImageURL'>", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -326,57 +353,10 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
 ![postFullImage](http://www.freecodecamp.org/postFullImageURL)`);
       });
     });
-
-    test("4-1-4. No postFullImage.", () => {
-      options.path = "/news/testexample/";
-      return HTMLtoMarkdown(`<!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <title>System Design Interview Questions – Concepts You Should Know</title>
-      </head>
-      <body class="post-template tag-interviews tag-systems-engineering tag-coding-interview">
-        <div class="site-wrapper">
-          <main id="site-main" class="site-main outer">
-            <div class="inner">
-              <article class="post-full post tag-interviews tag-systems-engineering tag-coding-interview ">
-                <header class="post-full-header">
-                  <h1 class="post-full-title">testexample post-full-title</h1>
-                </header>
-                <figure class="post-full-image">
-                </figure>
-                <section class="post-full-content">
-                  <div class="post-content">
-                  </div>
-                  <hr />
-                  <div class="post-full-author-header">
-                    <section class="author-card">
-                      <img class="author-profile-image" src="/news/content/images/size/w100/2019/06/WhatsApp-Image-2018-03-22-at-13.36.56.jpeg" alt="Zubin Pratap" />
-                      <section class="author-card-content">
-                        <h4 class="author-card-name"><a href="/news/author/authorURL/">authorName</a></h4>
-                      </section>
-                    </section>
-                  </div>
-                  <hr />
-                </section>
-              </article>
-            </div>
-          </main>
-        </div>
-      </body>
-    </html>`).then((data) => {
-        expect(data).toBe(
-`> -  原文地址：[testexample post-full-title](https://www.freecodecamp.org/news/testexample/)
-> -  原文作者：[authorName](https://www.freecodecamp.org/news/author/authorURL/)
-> -  译者：
-> -  校对者：
-
-`);
-      });
-    });
   });
 
-  describe("4-2. Abnormal case", () => {
-    test("4-2-1. No articleTitle", () => {
+  describe("5-2. Abnormal case", () => {
+    test("5-2-1. No articleTitle", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -419,7 +399,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-2. No articleTitle", () => {
+    test("5-2-2. No articleTitle", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -461,7 +441,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-3. No articleURL", () => {
+    test("5-2-3. No articleURL", () => {
       options.path = "";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -504,7 +484,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-4. No authorName", () => {
+    test("5-2-4. No authorName", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -547,7 +527,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-5. No authorName", () => {
+    test("5-2-5. No authorName", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -590,7 +570,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-6. No authorName", () => {
+    test("5-2-6. No authorName", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -633,7 +613,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-7. No authorName", () => {
+    test("5-2-7. No authorName", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -675,7 +655,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-8. No authorURL", () => {
+    test("5-2-8. No authorURL", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -718,7 +698,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-9. No authorURL", () => {
+    test("5-2-9. No authorURL", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -761,7 +741,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-10. No authorURL", () => {
+    test("5-2-10. No authorURL", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
     <html lang="en">
@@ -804,7 +784,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-11. Error in fullImage(<img src='' alt='postFullImage' />).", () => {
+    test("5-2-11. Error in fullImage(<img src='' alt='postFullImage' />).", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
       <html lang="en">
@@ -846,7 +826,7 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
       });
     });
 
-    test("4-2-12. Error in fullImage(<img alt='postFullImage' />).", () => {
+    test("5-2-12. Error in fullImage(<img alt='postFullImage' />).", () => {
       options.path = "/news/testexample/";
       return HTMLtoMarkdown(`<!DOCTYPE html>
       <html lang="en">
@@ -884,6 +864,47 @@ pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp
           </div>
         </body>
       </html>`).catch((err) => {
+        expect(err).toBe(Err_DOMWrong);
+      });
+    });
+
+    test("5-2-13. No postFullImage.", () => {
+      options.path = "/news/testexample/";
+      return HTMLtoMarkdown(`<!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <title>System Design Interview Questions – Concepts You Should Know</title>
+      </head>
+      <body class="post-template tag-interviews tag-systems-engineering tag-coding-interview">
+        <div class="site-wrapper">
+          <main id="site-main" class="site-main outer">
+            <div class="inner">
+              <article class="post-full post tag-interviews tag-systems-engineering tag-coding-interview ">
+                <header class="post-full-header">
+                  <h1 class="post-full-title">testexample post-full-title</h1>
+                </header>
+                <figure class="post-full-image">
+                </figure>
+                <section class="post-full-content">
+                  <div class="post-content">
+                  </div>
+                  <hr />
+                  <div class="post-full-author-header">
+                    <section class="author-card">
+                      <img class="author-profile-image" src="/news/content/images/size/w100/2019/06/WhatsApp-Image-2018-03-22-at-13.36.56.jpeg" alt="Zubin Pratap" />
+                      <section class="author-card-content">
+                        <h4 class="author-card-name"><a href="/news/author/authorURL/">authorName</a></h4>
+                      </section>
+                    </section>
+                  </div>
+                  <hr />
+                </section>
+              </article>
+            </div>
+          </main>
+        </div>
+      </body>
+    </html>`).catch((err) => {
         expect(err).toBe(Err_DOMWrong);
       });
     });
