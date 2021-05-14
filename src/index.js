@@ -1,6 +1,6 @@
 const https = require('https');
 const nodeFetch = require('node-fetch');
-const fsPromises = require('fs/promises');
+const fs = require('fs');
 const {
   hostURL_EN,
   options
@@ -32,9 +32,12 @@ const {
     const htmlString = await (await nodeFetch(URL, options)).text();
     const articleText = await HTMLtoMarkdown(htmlString);
 
-    await fsPromises.writeFile(
+    await fs.writeFile(
       input.markDownFileURL + articleFileName,
-      articleText
+      articleText,
+      (err) => {
+        if (err) return new Promise.reject(err);
+      }
     );
   } catch (error) {
     console.log('ERR:', error);

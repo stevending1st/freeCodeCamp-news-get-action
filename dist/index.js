@@ -45134,7 +45134,7 @@ module.exports = TurndownService;
 
 const https = __nccwpck_require__(7211);
 const nodeFetch = __nccwpck_require__(467);
-const fsPromises = __nccwpck_require__(9225);
+const fs = __nccwpck_require__(5747);
 const {
   hostURL_EN,
   options
@@ -45166,9 +45166,12 @@ const {
     const htmlString = await (await nodeFetch(URL, options)).text();
     const articleText = await HTMLtoMarkdown(htmlString);
 
-    await fsPromises.writeFile(
+    await fs.writeFile(
       input.markDownFileURL + articleFileName,
-      articleText
+      articleText,
+      (err) => {
+        if (err) return new Promise.reject(err);
+      }
     );
   } catch (error) {
     console.log('ERR:', error);
@@ -45385,14 +45388,6 @@ module.exports = JSON.parse("{\"amp\":\"&\",\"apos\":\"'\",\"gt\":\">\",\"lt\":\
 
 "use strict";
 module.exports = require("fs");;
-
-/***/ }),
-
-/***/ 9225:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("fs/promises");;
 
 /***/ }),
 
