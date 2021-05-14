@@ -1,8 +1,8 @@
 {
   "name": "freecodecamp-news-get-action",
   "private": true,
-  "version": "0.0.1",
-  "description": "fCC news get action.",
+  "version": "0.1.0",
+  "description": "Convert freeCodeCamp news articles into markdown files.",
   "main": "index.js",
   "scripts": {
     "jest": "jest",

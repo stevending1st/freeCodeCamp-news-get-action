@@ -1,5 +1,7 @@
 # freeCodeCamp-news-get-action
 
+![GitHub](https://img.shields.io/github/license/stevending1st/freeCodeCamp-news-get-action) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/stevending1st/freeCodeCamp-news-get-action) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/stevending1st/freeCodeCamp-news-get-action?include_prereleases&label=release-last) 
+
 Language: English | [简体中文](./README-zh-cn.md)
 
 ### Introduction
