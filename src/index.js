@@ -36,7 +36,7 @@ const {
       input.markDownFileURL + articleFileName,
       articleText,
       (err) => {
-        if (err) return new Promise.reject(err);
+        if (err) return Promise.reject(err);
       }
     );
   } catch (error) {
