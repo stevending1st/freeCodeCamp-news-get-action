@@ -1,5 +1,5 @@
 // Errs
-exports.Err_DontGetIssuesBody =
+exports.Err_DontGetNewsLink =
   'No parameters were found. Please confirm that the description of the issue has been entered.';
 exports.Err_DontGetTrueRoute =
   'The route to the article is not matched. Please confirm that the URL is correct.';

@@ -11,7 +11,7 @@ const {
 
 const {
   Path_ArticleFolder_R,
-  Err_DontGetIssuesBody,
+  Err_DontGetNewsLink,
   Err_DontGetTrueRoute,
   Err_SameNameFile,
   Err_NoPath,
@@ -33,15 +33,15 @@ const turndownService = new TurndownService({
 // Gather all conditioned inputs
 exports.gatherInputs = function gatherInputs() {
   return {
-    issuesBody: core.getInput("issuesBody") || undefined,
-    markDownFileURL: core.getInput("markDownFileURL") || "./",
+    newsLink: core.getInput("newsLink") || undefined,
+    markDownFilePath: core.getInput("markDownFilePath") || "./",
   }
 }
 
 // Existence check of input parameters.
 exports.inputExistCheck = (input) =>
   new Promise((resolve, reject) => {
-    input.issuesBody ? resolve(input.issuesBody) : reject(Err_DontGetIssuesBody);
+    input.newsLink ? resolve(input.newsLink) : reject(Err_DontGetNewsLink);
   });
 
 // Check the input parameters, and get the routing address of the article.

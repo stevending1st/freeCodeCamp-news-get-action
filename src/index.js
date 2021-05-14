@@ -22,7 +22,7 @@ const {
 
     await inputExistCheck(input);
 
-    const articleChildRouter = await getRouteAddr(input.issuesBody);
+    const articleChildRouter = await getRouteAddr(input.newsLink);
 
     const URL = `${hostURL_EN}/news/${articleChildRouter}/`;
     options.path = `/news/${articleChildRouter}/`;
@@ -33,7 +33,7 @@ const {
     const articleText = await HTMLtoMarkdown(htmlString);
 
     await fs.writeFile(
-      input.markDownFileURL + articleFileName,
+      input.markDownFilePath + articleFileName,
       articleText,
       (err) => {
         if (err) return Promise.reject(err);

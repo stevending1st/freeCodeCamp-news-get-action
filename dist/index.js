@@ -45156,7 +45156,7 @@ const {
 
     await inputExistCheck(input);
 
-    const articleChildRouter = await getRouteAddr(input.issuesBody);
+    const articleChildRouter = await getRouteAddr(input.newsLink);
 
     const URL = `${hostURL_EN}/news/${articleChildRouter}/`;
     options.path = `/news/${articleChildRouter}/`;
@@ -45167,7 +45167,7 @@ const {
     const articleText = await HTMLtoMarkdown(htmlString);
 
     await fs.writeFile(
-      input.markDownFileURL + articleFileName,
+      input.markDownFilePath + articleFileName,
       articleText,
       (err) => {
         if (err) return Promise.reject(err);
@@ -45186,7 +45186,7 @@ const {
 /***/ ((__unused_webpack_module, exports) => {
 
 // Errs
-exports.Err_DontGetIssuesBody =
+exports.Err_DontGetNewsLink =
   'No parameters were found. Please confirm that the description of the issue has been entered.';
 exports.Err_DontGetTrueRoute =
   'The route to the article is not matched. Please confirm that the URL is correct.';
@@ -45233,7 +45233,7 @@ const {
 
 const {
   Path_ArticleFolder_R,
-  Err_DontGetIssuesBody,
+  Err_DontGetNewsLink,
   Err_DontGetTrueRoute,
   Err_SameNameFile,
   Err_NoPath,
@@ -45255,15 +45255,15 @@ const turndownService = new TurndownService({
 // Gather all conditioned inputs
 exports.gatherInputs = function gatherInputs() {
   return {
-    issuesBody: core.getInput("issuesBody") || undefined,
-    markDownFileURL: core.getInput("markDownFileURL") || "./",
+    newsLink: core.getInput("newsLink") || undefined,
+    markDownFilePath: core.getInput("markDownFilePath") || "./",
   }
 }
 
 // Existence check of input parameters.
 exports.inputExistCheck = (input) =>
   new Promise((resolve, reject) => {
-    input.issuesBody ? resolve(input.issuesBody) : reject(Err_DontGetIssuesBody);
+    input.newsLink ? resolve(input.newsLink) : reject(Err_DontGetNewsLink);
   });
 
 // Check the input parameters, and get the routing address of the article.

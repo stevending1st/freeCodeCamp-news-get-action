@@ -1,10 +1,10 @@
-## 网页转换 Markdown
+## freeCodeCamp-news-get-action
 
 语言: [English](./README.md) | 简体中文
 
 ### 简介
 
-根据 freeCodeCamp 的 news 站点上文章的网页自动生成 Markdown 文件。可以 [在 GitHub 上提交 issue](#submit-an-issue) 或 [在本地执行脚本](#execute-script-locally) 自动生成 Markdown 文件。
+根据 freeCodeCamp 的 news 站点上文章的网页自动生成 Markdown 文件。可以 [在 GitHub 上提交 issue](#submit-an-issue) 自动生成 Markdown 文件。
 
 #### 项目结构
  
@@ -37,16 +37,33 @@ news-translate
          utilities.test.js  /** 测试文件 **/
 ```
 ---
+<h3>Usage</h3>
 
-<h3 id="submit-an-issue">通过 GitHub 的 issue 运行脚本</h3>
+在 job 中添加下面的 step.
 
-**Issues** >> **New issue** >> 翻译任务(自动爬取) **Get stared** >> 填写 issue 的标题和描述 >> **Submit new issue**
-
-#### 标题（Title）：
+```yml
+- uses: stevending1st/freeCodeCamp-news-get-action@main
+  with:
+    newsLink: '${{ github.event.issue.Body }}'
 ```
-[Auto]（此处替换为翻译的中文标题）
+
+下面是一个扩展示例，尽可能包含所有选项。
+
+```yml
+- uses: stevending1st/freeCodeCamp-news-get-action@main
+  with:
+    # 一个特定的格式的字符串，该字符串包含一个指向 freeCodeCamp 的News 的链接。
+    # 格式: "原文网址：[原文标题](https://www.freecodecamp.org/news/xxxxxxx/"
+    newsLink: '${{ github.event.issue.Body }}'
+    # 生成 MarkDown 文件的路径
+    # 相对命令行位置的相对路径
+    markDownFilePath: './chinese/articles/'
 ```
-翻译后的原文标题替换 `（此处替换为翻译的中文标题）`。
+
+<h4 id="submit-an-issue">通过 GitHub 的 issue 运行脚本</h4>
+
+**Issues** >> **New issue** >> 填写 issue 的标题和描述 >> **Submit new issue**
+
 #### 描述（Description）：
 ```
 - 原文网址：[原文标题](https://www.freecodecamp.org/news/路由/)
@@ -67,63 +84,29 @@ news-translate
 - MarkDown 文件：https://github.com/freeCodeCamp/news-translation/edit/master/chinese/articles/Example.md
 ```
 
-可以通过检查 **Actions** 的执行结果或者在 [freeCodeCamp
-/news-translation/chinese/articles/](https://github.com/freeCodeCamp/news-translation/tree/main/chinese/articles)，以确认脚本是否成功执行。
+可以通过检查 **Actions** 的执行结果，以确认脚本是否成功执行。或者在选项 `markDownFilePath` 中设置的位置检查文件是否存在。 如果未配置选项`markDownFilePath`，则默认情况下会在当前路径中生成文件。
 
-可以在确认脚本**成功**运行之后，修改 issue 的标题——删除 `[Auto]`。 除了使 issue 的标题整齐之外，这没有其他效果。
-
-如果脚本执行**失败**，您需要确认问题，解决问题，然后根据前面的步骤发布**新 issue**。 [*常见错误消息*](#CommonErrorMessages) 和 [*Actions 的日志*](https://github.com/freeCodeCamp/news-translation/actions) 将为您提供一些可靠的提示。如果找不到问题或不知道如何解决，请在 [issue](https://github.com/freeCodeCamp/news-translation/issues/new) 中留言或与我们联系 [freeCodeCamp 聊天室](https://chat.freecodecamp.org/channel/zhongwen)。
-
----
-
-<h3 id="execute-script-locally">本地运行脚本</h3>
-
-#### 建议最低的 node 版本
-```shell
-v14.16.0
-```
-
-#### install
-```shell
-cd ./news-translation
-npm install
-```
-
-#### 运行脚本
-```shell
-node ./script/toMarkdown/index.js <String>
-```
-
-**提示：** `<String>` 必须包含以下形式的字符串：`- 原文网址：[原文标题](https://www.freecodecamp.org/news/路由/)`。需要用文章的原始标题替换 `原文标题`，需要用文章的路由替换 `路由`。如果该形式的字符串出现多次，则只会匹配第一个。
-
-#### 示例：
-如果文章的 URL 是 `https://www.freecodecamp.org/news/Example/`，标题是 `Example Title`。
-你可以运行：
-```shell
-node ./script/toMarkdown/index.js "- 原文网址：[Example Title](https://www.freecodecamp.org/news/Example/)"
-```
-
----
+如果脚本执行**失败**，您需要确认问题，解决问题，然后根据前面的步骤发布**新 issue**。 [*常见错误消息*](#CommonErrorMessages) 和 *Actions 的日志* 将为您提供一些可靠的提示。
 
 <h3 id="CommonErrorMessages">常见错误消息</h3>
 
-如果您不知道如何解决问题，请在 [issue](https://github.com/freeCodeCamp/news-translation/issues/new) 中留言，或通过 [freeCodeCamp 聊天室](https://chat.freecodecamp.org/channel/zhongwen)联系我们。
-
-- **This issue does not need to generate a markdown file.**
-  如果想通过新 issue 运行自动生成 Markdown 的脚本，请确保 issue 的标题以 `[Auto]` 开头。如果您不想执行该脚本，这是预期的结果。
-- **The description of the issue is empty.**
-  issue 的描述为空，请根据模板填写内容。
 - **No parameters were found. Please confirm that the description of the issue has been entered.**
   issue 的描述为空，请根据模板填写内容。
 - **The route to the article is not matched. Please confirm that the URL is correct.**
   在 issue 的描述中，只需要替换 `原文标题`， `路由` 和 `文章文件名称` 即可，并且请保留其他字符。
 - **There is one file with the same name exists.Please check if the article has been added.**
-  在 `./chinese/articles` 文件夹下有一个同名文件。请确认该文章之前是否已被其他人翻译或处于待翻译状态。如果不是上述情况，请在 [issue](https://github.com/freeCodeCamp/news-translation/issues/new) 中留言，或通过 [freeCodeCamp 聊天室](https://chat.freecodecamp.org/channel/zhongwen)联系我们。
+  在 `./chinese/articles` 文件夹下有一个同名文件。
 - **The DOM of the website has been modified, or there is a problem with loading, please confirm.**
-  网站的 DOM 结构可能更改，并且脚本需要修改。请在 [issue](https://github.com/freeCodeCamp/news-translation/issues/new) 中留言，或通过 [freeCodeCamp 聊天室](https://chat.freecodecamp.org/channel/zhongwen)联系我们。
+  网站的 DOM 结构可能更改，并且脚本需要修改。
+
+---
+
+## 贡献者指南
+
+请转到[贡献者指南](CONTRIBUTING.md)。
 
 ---
 
 ### 许可证
 
-- [`/script/toMarkdown`](/script/toMarkdown) 文件夹下的脚本遵循 [MIT](/LICENSE) 许可证.
+- 程序遵循 [BSD-3-Clause](LICENSE.md) 许可证。

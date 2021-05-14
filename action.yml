@@ -2,11 +2,11 @@ name: "freeCodeCamp-news-get-action"
 description: "freeCodeCamp-news-get-action"
 author: ""
 inputs:
-  issuesBody:
-    description: ""
+  newsLink:
+    description: "A string in a specific format that contains a link to freeCodeCamp News"
     required: true
-  markDownFileURL:
-    description: ""
+  markDownFilePath:
+    description: "Path  of the generated MarkDown file and relative path relative to the root folder"
     required: false
     default: "./"
 

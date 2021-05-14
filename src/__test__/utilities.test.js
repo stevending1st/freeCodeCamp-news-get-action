@@ -1,5 +1,5 @@
 const {
-  Err_DontGetIssuesBody,
+  Err_DontGetNewsLink,
   Err_DontGetTrueRoute,
   Err_SameNameFile,
   Err_NoPath,
@@ -25,27 +25,27 @@ function buildInput(inputs) {
   // Reset modules and remove input environment variables before each run
   beforeEach(() => {
     jest.resetModules();
-    delete process.env.INPUT_ISSUESBODY;
-    delete process.env.INPUT_MARKDOWNFILEURL;
+    delete process.env.INPUT_NEWSLINK;
+    delete process.env.INPUT_markDownFilePath;
   });
 
 describe("1. test gather all conditioned inputs.", () => {
   test("1-1. gather minimal inputs.", () => {
     expect(gatherInputs()).toEqual({
-      issuesBody: undefined,
-      markDownFileURL: "./"
+      newsLink: undefined,
+      markDownFilePath: "./"
     });
   });
 
   test("1-2. With parameters.", () => {
     buildInput({
-      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
-      markDownFileURL: "./src/test/"
+      newsLink: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFilePath: "./src/test/"
     });
 
     expect(gatherInputs()).toEqual({
-      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
-      markDownFileURL: "./src/test/"
+      newsLink: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFilePath: "./src/test/"
     });
   });
 });
@@ -53,8 +53,8 @@ describe("1. test gather all conditioned inputs.", () => {
 describe("2. test existence check of input parameters.)", () => {
   test("2-1. exist.", () => {
     return inputExistCheck({
-      issuesBody: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
-      markDownFileURL: "./"
+      newsLink: "test.XXXXXXXXXxxxxxxXXXXXXXxxxxx",
+      markDownFilePath: "./"
     }).then((data) => {
       expect(data).toBe("test.XXXXXXXXXxxxxxxXXXXXXXxxxxx");
     });
@@ -62,10 +62,10 @@ describe("2. test existence check of input parameters.)", () => {
 
   test("2-2. does not exist.", () => {
     return inputExistCheck({
-      issuesBody: undefined,
-      markDownFileURL: "./"
+      newsLink: undefined,
+      markDownFilePath: "./"
     }).catch((err) => {
-      expect(err).toBe(Err_DontGetIssuesBody);
+      expect(err).toBe(Err_DontGetNewsLink);
     });
   });
 });
