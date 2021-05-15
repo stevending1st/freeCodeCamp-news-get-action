@@ -108,4 +108,4 @@ Please go to the [contributing guide](CONTRIBUTING.md).
 
 ### License
 
-- The computer software is licensed under the [BSD-3-Clause](LICENSE.md) license.
+- The computer software is licensed under the [BSD-3-Clause](LICENSE) license.

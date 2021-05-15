@@ -111,4 +111,4 @@ news-translate
 
 ### 许可证
 
-- 程序遵循 [BSD-3-Clause](LICENSE.md) 许可证。
+- 程序遵循 [BSD-3-Clause](LICENSE) 许可证。
